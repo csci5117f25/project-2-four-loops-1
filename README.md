@@ -4,15 +4,16 @@ CSCI 5117, Fall 2025, [assignment description](https://canvas.umn.edu/courses/51
 
 ## App Info:
 
-* Team Name: TODO
-* App Name: TODO
+* Team Name: FOUR LOOPS
+* App Name: MediMate
 * App Link: <https://TODO.com/>
 
 ### Students
 
-* First Last, x500@umn.edu
-* ...
-
+* Alexander Garduno Garcia, gardu022@umn.edu
+* Reshma Rao Chandukudlu Hosamane, chand950@umn.edu
+* Tejeshwini Ramesh Subasri, rames189@umn.edu
+* Shivank Sapra, sapra013@umn.edu
 
 ## Key Features
 

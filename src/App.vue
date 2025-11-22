@@ -1,11 +1,11 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
   <header>
     <nav>
+      <!-- User RouterLink instead of a tag for links. -->
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/about">About</RouterLink>
       <RouterLink :to="{ name: 'test_w_id', params: { id: 17 } }">test</RouterLink>
@@ -16,7 +16,10 @@ import HelloWorld from './components/HelloWorld.vue'
   <RouterView />
 </template>
 
+
 <style scoped>
+/*
+
 header {
   line-height: 1.5;
   max-height: 100vh;
@@ -78,4 +81,5 @@ nav a:first-of-type {
     margin-top: 1rem;
   }
 }
+   */
 </style>

@@ -6,14 +6,17 @@ import { getFirestore } from 'firebase/firestore'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBAD46ThM5Rq-PiZs1vCK6Ff82YYczz-rw",
-  authDomain: "lec21-test.firebaseapp.com",
-  projectId: "lec21-test",
-  storageBucket: "lec21-test.firebasestorage.app",
-  messagingSenderId: "114123285847",
-  appId: "1:114123285847:web:8b4bc1ebbd9cc743c40a12"
+  apiKey: "AIzaSyCqZTmlLBWhx7awpLJ1Uuls9pVhRS_tey0",
+  authDomain: "project2-e9097.firebaseapp.com",
+  projectId: "project2-e9097",
+  storageBucket: "project2-e9097.firebasestorage.app",
+  messagingSenderId: "356904850",
+  appId: "1:356904850:web:b621dc69626ba76cc3db4b"
 };
 
 // Initialize Firebase

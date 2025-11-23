@@ -10,19 +10,19 @@ import { collection } from 'firebase/firestore'
 import {db} from '../firebase_conf'
 import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth'
 
-const tests = useCollection(collection(db, 'tests'))
+const tests = useCollection(collection(db, 'Medications'))
 const user = useCurrentUser()
 const auth = useFirebaseAuth()
 
 async function login() {
     try {
-        const result = await signInWithPopup(auth, provider)
+        await signInWithPopup(auth, provider)
     } catch {
         alert("oh no");
     }
 }async function logout() {
     try {
-        const result = await signOut(auth)
+        await signOut(auth)
     } catch {
         alert("oh no");
     }

@@ -4,6 +4,7 @@
 
 
 <script setup>
+// eslint-disable-next-line no-unused-vars
 import { ref } from 'vue'
 import { useCollection, useCurrentUser, useFirebaseAuth } from 'vuefire'
 import { collection } from 'firebase/firestore'

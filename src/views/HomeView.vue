@@ -1,3 +1,8 @@
+<script setup>
+  import {useAuth} from '../composables/authComposable'
+
+  const user = useAuth().user;
+</script>
 <template>
   <main class="landing-container">
     <!-- Hero -->
@@ -7,9 +12,13 @@
         Medimate helps you stay on track with doses, refills, and inventory — all in one clean, simple interface.
       </p>
 
-      <button class="cta-button" @click="$router.push('/add_medicine')">
+      <button v-if="!useAuth().user" class="cta-button" @click="useAuth().login">
         Get Started
       </button>
+      <button v-else class="cta-button" @click="$router.push('/view-meds')">
+        My Medications
+      </button>
+
     </section>
 
     <!-- Feature Section -->

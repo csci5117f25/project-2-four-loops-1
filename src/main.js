@@ -6,6 +6,8 @@ import { VueFire, VueFireAuth } from 'vuefire'
 import App from './App.vue'
 import router from './router'
 import { firebaseApp } from './firebase_conf'
+import "leaflet/dist/leaflet.css";
+
 
 const app = createApp(App)
 app.use(VueFire, {

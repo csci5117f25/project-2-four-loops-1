@@ -11,11 +11,13 @@ const getUserID = () => {
 
 export const getMedsCollectionRef = () => {
     const uid = getUserID();
-    return collection(db, "users", uid, "medication");
+    return collection(db, "users", uid, "medications");
 }
 
 export const saveMeds = async (data) => {
-    const colRef = getMedsCollectionRef();
+    const uid = getUserID()
+    console.log(uid)
+    const colRef = collection(db, "users", uid, "medications");
 
     const payload = {
         ...data,
@@ -36,7 +38,7 @@ export const getAllMeds = async () => {
 
 export const updateMeds = async (id, data) => {
     const uid = getUserID();
-    const docRef = doc(db, "users", uid, "medication", id);
+    const docRef = doc(db, "users", uid, "medications", id);
     return await updateDoc(docRef, {
         ...data, updatedAt: serverTimestamp(),
     })
@@ -46,7 +48,7 @@ export const getMedsById = async (id) => {
     const uid = auth.currentUser?.uid;
     if(!uid) throw Error("User not logged in");
 
-    const docRef = doc(db, "users", uid, "medication", id);
+    const docRef = doc(db, "users", uid, "medications", id);
     const snapshot = await getDoc(docRef);
     if(!snapshot.exists()) throw Error("Medication not found");
 
@@ -58,7 +60,7 @@ export const deleteMedById = async (id) => {
     if(!uid) throw Error("User is not logged in")
 
     try{
-        const docRef = doc(db, "users", uid, "medication", id);
+        const docRef = doc(db, "users", uid, "medications", id);
         await deleteDoc(docRef);
         return { success: true };
     } catch (err) {

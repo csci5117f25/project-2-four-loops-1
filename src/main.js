@@ -6,7 +6,8 @@ import { VueFire, VueFireAuth } from 'vuefire'
 import App from './App.vue'
 import router from './router'
 import { firebaseApp } from './firebase_conf'
-import "leaflet/dist/leaflet.css";
+// import "leaflet/dist/leaflet.css";
+import PrimeVue from 'primevue/config';
 
 
 const app = createApp(App)
@@ -19,6 +20,7 @@ app.use(VueFire, {
   ],
 })
 app.use(router)
+app.use(PrimeVue)
 
 app.mount('#app')
 

@@ -54,6 +54,7 @@ watch(
     <div class="nav-center" :class="{ 'nav-center--open': isMobileMenuOpen }">
       <ul class="nav-links">
         <li @click="go('/')">Home</li>
+        <li @click="go('/dashboard')">Dashboard</li>
         <li @click="go('/add_medicine')">Add Medicine</li>
         <li @click="go('/view-meds')">Medications</li>
       </ul>
@@ -76,12 +77,7 @@ watch(
   </nav>
 
   <!-- Full-width overlay to close menu on mobile -->
-  <div
-    v-if="isMobileMenuOpen"
-    class="menu-overlay"
-    @click="closeMobileMenu"
-    aria-hidden="true"
-  >
+  <div v-if="isMobileMenuOpen" class="menu-overlay" @click="closeMobileMenu" aria-hidden="true">
   </div>
 </template>
 
@@ -167,9 +163,12 @@ watch(
   display: none;
   flex-direction: column;
   justify-content: center;
-  gap: 3px;          /* was 4px */
-  width: 26px;       /* was 32px */
-  height: 26px;      /* was 32px */
+  gap: 3px;
+  /* was 4px */
+  width: 26px;
+  /* was 32px */
+  height: 26px;
+  /* was 32px */
   background: none;
   border: none;
   cursor: pointer;
@@ -177,7 +176,8 @@ watch(
 }
 
 .burger span {
-  height: 2px;       /* keep 2px or reduce to 1.5px if you want thinner */
+  height: 2px;
+  /* keep 2px or reduce to 1.5px if you want thinner */
   width: 100%;
   background: var(--color-text);
   border-radius: 999px;
@@ -246,12 +246,16 @@ watch(
 
 /* Burger X animation (adjusted translate to match smaller size) */
 .burger .line-open:nth-child(1) {
-  transform: translateY(5px) rotate(45deg); /* was 6px */
+  transform: translateY(5px) rotate(45deg);
+  /* was 6px */
 }
+
 .burger .line-open:nth-child(2) {
   opacity: 0;
 }
+
 .burger .line-open:nth-child(3) {
-  transform: translateY(-5px) rotate(-45deg); /* was -6px */
+  transform: translateY(-5px) rotate(-45deg);
+  /* was -6px */
 }
 </style>

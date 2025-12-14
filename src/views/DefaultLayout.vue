@@ -1,3 +1,4 @@
+<!-- eslint-disable no-unused-vars -->
 <script setup>
 import Navbar from "@/components/NavbarComp.vue";
 import Footer from "@/components/FooterComp.vue";

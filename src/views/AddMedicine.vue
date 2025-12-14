@@ -233,6 +233,7 @@ function fallbackParseLinesToMeds(text) {
 // ---------- FORM FLOW ----------
 const openConfirmation = () => {
   if (!form.value.medicineName || !form.value.medicineType || !form.value.startDate) {
+    console.log(form.value.medicineName, form.value.medicineType, form.value.startDate)
     alert("Please fill required fields (Name, Type, Start Date).");
     return;
   }
@@ -338,7 +339,7 @@ const saveMedicationToDB = async () => {
 
         <div class="form-group">
           <label>Unit</label>
-          <input v-model="form.unit" type="text" placeholder="e.g., Enum: pills, ml, mg, units, drops" />
+          <input v-model="form.medicineType" type="text" placeholder="e.g., Enum: pills, ml, mg, units, drops" />
         </div>
 
         <div class="form-group">
@@ -430,10 +431,10 @@ const saveMedicationToDB = async () => {
         <ul class="confirm-list">
           <li><strong>Name:</strong> {{ form.medicineName }}</li>
           <li><strong>Description:</strong> {{ form.description || "—" }}</li>
-          <li><strong>Dosage:</strong> {{ form.dosage || "—" }}</li>
+          <li><strong>Dosage:</strong> {{ form.doseQuantity || "—" }}</li>
           <li><strong>Type:</strong> {{ form.medicineType }}</li>
           <li><strong>Schedule:</strong> {{ form.schedule || "—" }}</li>
-          <li><strong>Time:</strong> {{ form.time || "—" }}</li>
+          <li><strong>Time:</strong> {{ form.times || "—" }}</li>
           <li>
             <strong>Duration:</strong>
             {{ form.startDate || "—" }} → {{ form.endDate || "—" }}

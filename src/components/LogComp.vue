@@ -21,6 +21,8 @@ function normalizeTimes(med) {
     return [];
 }
 
+
+
 /* LOAD DAILY DATA */
 async function loadTodaySlots() {
     const uid = auth.currentUser?.uid;
@@ -105,6 +107,18 @@ async function handleUndo(slot) {
     await unLogDose(slot);
     slot.isTaken = false;
 }
+
+function isLowStock(med) {
+    if (med.currentInventory === null || med.currentInventory === undefined || med.refillThreshold === null || med.refillThreshold === undefined) {
+        return false;
+    }
+    const inventory = Number(med.currentInventory);
+    const threshold = Number(med.refillThreshold);
+
+    if (isNaN(inventory) || isNaN(threshold)) return false;
+
+    return inventory <= threshold;
+}
 </script>
 
 <template>
@@ -128,10 +142,14 @@ async function handleUndo(slot) {
                             <div class="dose-name">{{ slot.medications.medicineName }}</div>
                             <div class="dose-meta">
                                 {{ slot.medications.doseQuantity || 1 }}
-                                {{ slot.medications.unit || "dose" }}•{{ slot.medications.form || "Medication" }}
+                                {{ slot.medications.unit || "dose" }} • {{ slot.medications.form || "Medication" }}
                             </div>
-                            <div class="dose-stock">
+                            <div v-if="typeof slot.medications.currentInventory === 'number'" class="dose-stock">
                                 Remaining: {{ slot.medications.currentInventory }}
+                            </div>
+                            <div v-if="isLowStock(slot.medications)" class="low-stock-warning">
+                                ⚠️ Low stock ({{ slot.medications.currentInventory }} {{ slot.medications.unit }}
+                                remaining). Consider refilling soon
                             </div>
                         </div>
                     </div>
@@ -159,12 +177,15 @@ async function handleUndo(slot) {
 
                             <div class="dose-meta">
                                 {{ dose.medications.doseQuantity || 1 }}
-                                {{ dose.medications.unit || "dose" }}
-                                • {{ dose.medications.form || "Medication" }}
+                                {{ dose.medications.unit || "dose" }} • {{ dose.medications.form || "Medication" }}
                             </div>
 
-                            <div class="dose-stock">
+                            <div v-if="typeof dose.medications.currentInventory === 'number'" class="dose-stock">
                                 Remaining: {{ dose.medications.currentInventory }}
+                            </div>
+                            <div v-if="isLowStock(dose.medications)" class="low-stock-warning">
+                                ⚠️ Low stock ({{ dose.medications.currentInventory }} {{ dose.medications.unit }}
+                                remaining). Consider refilling soon
                             </div>
                         </div>
                     </div>
@@ -248,5 +269,14 @@ async function handleUndo(slot) {
     border: none;
     cursor: pointer;
     font-weight: 500;
+}
+
+.low-stock-warning {
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: #facc15;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 </style>

@@ -115,7 +115,13 @@ export async function logDose(slot) {
     const currentInventory = normalizeNumber(medData.currentInventory);
     const doseQuantity = normalizeNumber(medData.doseQuantity);
 
-    if (currentInventory < doseQuantity) {
+    const hasInventory =
+      medData.currentInventory !== null &&
+      medData.currentInventory !== undefined &&
+      !isNaN(medData.currentInventory) &&
+      !isNaN(doseQuantity);
+
+    if (hasInventory && currentInventory < doseQuantity) {
       throw new Error("Not enough inventory");
     }
 
@@ -128,10 +134,12 @@ export async function logDose(slot) {
       dosageTaken: doseQuantity,
     });
 
-    tx.update(medRef, {
-      currentInventory: currentInventory - doseQuantity,
-      updatedAt: Timestamp.now(),
-    });
+    if (hasInventory) {
+      tx.update(medRef, {
+        currentInventory: currentInventory - doseQuantity,
+        updatedAt: Timestamp.now(),
+      });
+    }
   });
 }
 
@@ -157,11 +165,19 @@ export async function unLogDose(slot) {
     const doseQuantity = normalizeNumber(medData.doseQuantity);
     const currentInventory = normalizeNumber(medData.currentInventory);
 
+    const hasInventory =
+      medData.currentInventory !== null &&
+      medData.currentInventory !== undefined &&
+      !isNaN(medData.currentInventory) &&
+      !isNaN(doseQuantity);
+
     tx.delete(logRef);
 
-    tx.update(medRef, {
-      currentInventory: currentInventory + doseQuantity,
-      updatedAt: Timestamp.now(),
-    });
+    if (hasInventory) {
+      tx.update(medRef, {
+        currentInventory: currentInventory + doseQuantity,
+        updatedAt: Timestamp.now(),
+      });
+    }
   });
 }

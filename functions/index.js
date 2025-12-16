@@ -124,6 +124,8 @@ exports.medicationReminder = onSchedule(
 /**********************************************
  * STOCK REMINDER 
  **********************************************/
+// ... existing imports and code ...
+
 exports.stockReminder = onSchedule(
   {
     schedule: "0 8 * * *", 
@@ -143,14 +145,10 @@ exports.stockReminder = onSchedule(
       const stock = parseFloat(med.currentInventory || 0);
       const threshold = parseFloat(med.refillThreshold || 5);
 
-      // 1. If inventory is zero, do nothing (as requested)
       if (stock <= 0) continue;
 
-      // 2. Check Threshold
       if (stock <= threshold) {
         const userRef = medDoc.ref.parent.parent;
-        
-        // Fetch User & Preferences (including saved pharmacy data)
         const [userSnap, prefSnap] = await Promise.all([
            userRef.get(),
            db.doc(`${userRef.path}/preferences/general`).get()
@@ -158,33 +156,64 @@ exports.stockReminder = onSchedule(
 
         const userData = userSnap.data();
         const fcmToken = userData?.fcmToken;
-
-        // 3. No Token -> Do nothing
         if (!fcmToken) continue;
 
         const prefs = prefSnap.exists ? prefSnap.data() : {};
         if (prefs.enableStockAlerts === false) continue;
 
-        // 4. Construct Message Body with Pharmacy Logic
+        // 1. Construct Body Text
         let bodyText = `You only have ${stock} ${med.unit || 'units'} of ${med.medicineName} left.`;
         
-        // 4.1 Check Saved Pharmacy
-        if (prefs.savedPharmacy && prefs.savedPharmacy.name) {
-            bodyText += ` Refill at: ${prefs.savedPharmacy.name}.`;
+        let mapLink = "";
+        let pharmacyName = "";
+
+        // ---------------------------------------------------------
+        // UPDATED URL LOGIC (Matches openGoogleMaps)
+        // ---------------------------------------------------------
+        const getMapLink = (lat, lng, name, address) => {
+            let query = `${name || ""} ${address || ""}`.trim();
+            if (!query) query = `${lat},${lng}`;
+            
+            // Using the specific URL format you requested
+            return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query);
+        };
+        // ---------------------------------------------------------
+
+        if (prefs.savedPharmacy && prefs.savedPharmacy.lat) {
+            mapLink = getMapLink(
+                prefs.savedPharmacy.lat, 
+                prefs.savedPharmacy.lng, 
+                prefs.savedPharmacy.name, 
+                prefs.savedPharmacy.address
+            );
+            pharmacyName = prefs.savedPharmacy.name || "Saved Pharmacy";
+            bodyText += " Time to refill!"; 
         } 
-        // 4.2 Check Nearby (Auto-detected) Pharmacy IF location enabled
-        else if (prefs.enablePharmacyLocation && prefs.nearestPharmacy && prefs.nearestPharmacy.name) {
-            bodyText += ` Nearest pharmacy: ${prefs.nearestPharmacy.name} (~${prefs.nearestPharmacy.distanceMiles} mi).`;
+        else if (prefs.nearestPharmacy) {
+            mapLink = getMapLink(
+                prefs.nearestPharmacy.lat, 
+                prefs.nearestPharmacy.lng, 
+                prefs.nearestPharmacy.name, 
+                prefs.nearestPharmacy.address
+            );
+            pharmacyName = prefs.nearestPharmacy.name || "Nearest Pharmacy";
+            bodyText += " Time to refill!";
         }
-        // 4.3 Else (Generic alert - already set in bodyText)
 
         messages.push(
             getMessaging().send({
               token: fcmToken,
               notification: {
-                title: `Low Stock Warning ⚠️`,
-                body: bodyText,
+                title: `Low Stock: ${med.medicineName} ⚠️`,
+                body: bodyText, 
               },
+              data: {
+                medId: medDoc.id,
+                action: "stock_alert",
+                currentStock: String(stock),
+                mapUrl: mapLink,       
+                pharmacyName: pharmacyName 
+              }
             })
         );
       }

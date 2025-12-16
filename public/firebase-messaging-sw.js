@@ -1,40 +1,58 @@
-// public/firebase-messaging-sw.js
-
-// 1. Import Firebase scripts (Compat version is correct for SW)
+/* public/firebase-messaging-sw.js */
 importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js");
 
-// 2. Initialize Firebase
-// (These keys are safe to be public in a frontend app)
 firebase.initializeApp({
   apiKey: "AIzaSyCqZTmlLBWhx7awpLJ1Uuls9pVhRS_tey0",
-  authDomain: "project2-e9097.firebaseapp.com",
   projectId: "project2-e9097",
-  storageBucket: "project2-e9097.firebasestorage.app",
   messagingSenderId: "356904850",
   appId: "1:356904850:web:b621dc69626ba76cc3db4b"
+  // ... other keys ...
 });
 
-// 3. Initialize Messaging
 const messaging = firebase.messaging();
 
-// 4. Handle Background Messages
-// This triggers when the browser receives a push while your tab is CLOSED or HIDDEN.
+// 1. SHOW NOTIFICATION (When App is Closed)
 messaging.onBackgroundMessage((payload) => {
-  console.log("[SW] Background message received:", payload);
-
-  // Customize the notification here
+  console.log("[SW] Background Message:", payload);
+  
   const notificationTitle = payload.notification?.title || "Medication Reminder";
   const notificationOptions = {
-    body: payload.notification?.body || "It's time for your meds.",
-    icon: "/icons/icon-192.png", // Ensure this file exists in /public/icons/
-    
-    // Optional: Clicking the notification opens your app
+    body: payload.notification?.body,
+    icon: "/icons/icon-192.png",
+    // CRITICAL: Pass data (mapUrl) to the notification so click listener can use it
     data: payload.data 
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// REMOVED: self.addEventListener("push") 
-// Reason: Firebase SDK handles this automatically. Keeping it often causes double notifications.
+// 2. HANDLE CLICK (When User Clicks the System Notification)
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close(); // Close the popup
+
+  const data = event.notification.data;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+      
+      // CASE A: Stock Alert (Has Map URL) -> Open Map in New Tab
+      if (data && data.mapUrl) {
+        return self.clients.openWindow(data.mapUrl);
+      }
+
+      // CASE B: Medication Reminder (No Map URL) -> Focus/Open App
+      // 1. Try to focus an existing tab
+      for (let i = 0; i < clientList.length; i++) {
+        const client = clientList[i];
+        if (client.url.includes('/') && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // 2. If no tab open, open a new one
+      if (self.clients.openWindow) {
+        return self.clients.openWindow('/');
+      }
+    })
+  );
+});

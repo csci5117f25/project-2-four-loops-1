@@ -19,7 +19,6 @@ export function useNotifications() {
     const user = auth.currentUser;
     if (!user) return;
     try {
-      // Check if token exists before trying to delete (optional optimization)
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, { fcmToken: deleteField() });
       console.log("🗑️ FCM Token deleted because notifications were blocked/disabled.");
@@ -44,17 +43,13 @@ export function useNotifications() {
       const userData = userSnap.exists() ? userSnap.data() : {};
       const hasToken = !!userData.fcmToken;
 
-      // ----------------------------------------------------------------
-      // CRITICAL FIX: If Browser Blocked it, DESTROY the token immediately
-      // ----------------------------------------------------------------
       if (browserPerm === "denied" && hasToken) {
         console.log("🚫 Detected 'Denied' permission with active token. Deleting...");
         await removeFCMToken();
-        needsNotificationPrompt.value = true; // Show banner so they know why
+        needsNotificationPrompt.value = true;
         return;
       }
 
-      // Check User Preferences
       const prefRef = doc(db, "users", user.uid, "preferences", "general");
       const prefSnap = await getDoc(prefRef);
       const prefData = prefSnap.exists() ? prefSnap.data() : {};
@@ -62,21 +57,18 @@ export function useNotifications() {
       const isAnyEnabled = (prefData.enableNotifications !== false) || (prefData.enableStockAlerts === true);
 
       if (!isAnyEnabled) {
-        if (hasToken) await removeFCMToken(); // Cleanup if they disabled in settings
+        if (hasToken) await removeFCMToken();
         needsNotificationPrompt.value = false;
         return;
       }
 
-      // If Granted -> Ensure Token Exists
       if (browserPerm === "granted") {
         if (!hasToken) {
           console.log("ℹ️ Permission granted but Token missing. Fetching silently...");
           await askPermission();
         }
         needsNotificationPrompt.value = false;
-      } 
-      // If Default (Ask) or Denied -> Show Banner
-      else {
+      } else {
         needsNotificationPrompt.value = true;
       }
 
@@ -86,26 +78,22 @@ export function useNotifications() {
   };
 
   /**
-   * 2. LIVE LISTENER (Runs constantly)
-   * Detects if user changes settings via the Lock Icon while on the page
+   * 2. LIVE LISTENER
    */
   const initPermissionListener = async () => {
     if (!('permissions' in navigator)) return;
 
     try {
       const status = await navigator.permissions.query({ name: 'notifications' });
-      
       status.onchange = async () => {
         console.log("🔄 Browser Permission Changed to:", status.state);
-        permission.value = status.state; // 'granted', 'denied', 'prompt'
+        permission.value = status.state;
 
-        // If user manually turns it off (Denied) or resets it (Prompt/Default)
         if (status.state !== 'granted') {
           console.log("🛑 User revoked permission. Deleting token...");
           await removeFCMToken();
           needsNotificationPrompt.value = true;
         } else {
-          // If they turned it ON manually, we might want to generate a token
           checkTokenStatus(); 
         }
       };
@@ -115,7 +103,7 @@ export function useNotifications() {
   };
 
   /**
-   * ASK PERMISSION (Button Click)
+   * ASK PERMISSION
    */
   const askPermission = async () => {
     console.log("🔔 Asking Permission...");
@@ -130,7 +118,6 @@ export function useNotifications() {
           detail: "Click the Lock icon 🔒 -> Reset permissions -> Reload page.",
           life: 8000
         });
-        // We also ensure token is gone if they just clicked Block
         await removeFCMToken(); 
         return null;
       }
@@ -159,12 +146,35 @@ export function useNotifications() {
     }
   };
 
+  /**
+   * HANDLE INCOMING MESSAGES (Foreground / App Open)
+   */
   onMessage(messaging, (payload) => {
+    console.log("🔥 Foreground Message Received:", payload);
     const { title, body } = payload.notification || {};
-    showToast({ severity: "success", summary: title, detail: body, life: 6000 });
-    if (Notification.permission === "granted") {
-      new Notification(title || "Medication Reminder", { body, icon: "/icons/icon-192.png" });
+    const data = payload.data || {};
+
+    let detailHtml = body;
+
+    // If stock alert has a map link, create a clickable HTML link
+    if (data.mapUrl && data.pharmacyName) {
+      detailHtml = `${body} <br/> 
+        Refill at: <a href="${data.mapUrl}" target="_blank" style="color: #4ade80; text-decoration: underline; font-weight: bold;">
+          ${data.pharmacyName}
+        </a>`;
     }
+
+    // 1. Show In-App Toast (Now renders the HTML link via App.vue update)
+    showToast({
+      severity: "info",
+      summary: title || "New Message",
+      detail: detailHtml, 
+      life: 8000, 
+    });
+
+    // 2. REMOVED: System Notification generation.
+    // This ensures that if the app is open, we ONLY show the Toast, not a system popup.
+    // The Service Worker handles system notifications when the app is closed.
   });
 
   return { 
@@ -172,6 +182,6 @@ export function useNotifications() {
     askPermission, 
     removeFCMToken, 
     checkTokenStatus,
-    initPermissionListener // Exported so App.vue can start it
+    initPermissionListener 
   };
 }

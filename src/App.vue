@@ -40,14 +40,23 @@ function ignoreNotifications() {
 
 <template>
   <div class="app-container">
-    <Toast position="top-right" :baseZIndex="30000" class="app-toast" />
+    
+    <Toast position="top-right" :baseZIndex="30000" class="app-toast">
+        <template #message="slotProps">
+            <div class="flex flex-column items-start" style="gap: 4px;">
+                <div class="font-bold text-lg" style="font-weight: 700; margin-bottom: 4px;">
+                  {{ slotProps.message.summary }}
+                </div>
+                <div v-html="slotProps.message.detail" class="text-sm"></div>
+            </div>
+        </template>
+    </Toast>
     
     <div v-if="needsNotificationPrompt" class="notif-banner">
       <div class="notif-content">
         <span class="notif-icon">🔔</span>
         <p>Enable notifications to get medication reminders?</p>
       </div>
-      
       <div class="notif-actions">
         <button @click="ignoreNotifications" class="btn-ignore">Ignore</button>
         <button @click="enableNotifications" class="btn-enable">Enable</button>

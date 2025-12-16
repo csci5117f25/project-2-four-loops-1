@@ -42,14 +42,18 @@ onMounted(loadMeds)
                        </div>
                       
                        <div class="stack-description">
-                           <p>
-                               Stock: {{  med.stock || "-"}}
+                           <p v-if=" med.currentInventory <= parseInt(med.refillThreshold) " class="low-stock-warning">
+                                ⚠️ Low stock: ({{ med.currentInventory }}
+                  {{ med.unit || "" }} remaining)
+                           </p>
+                           <p v-else>
+                                Stock: {{  med.currentInventory || "-"}}
                            </p>
                            <p>
-                                <!-- use end date here? -->
-                               Expiration Date: {{  med.endDate || "-"}}
+                               Expiration Date: {{  med.expiryDate || "-"}}
                            </p>
                            <p>
+
                                Refill ETA: {{ med.refillThreshold || "-" }}
                            </p>
                        </div>
@@ -107,6 +111,12 @@ onMounted(loadMeds)
    transition: box-shadow 0.25s ease;
 }
 
+.low-stock-warning {
+  margin-top: 4px;
+  font-size: 0.7rem;
+  color: #f59e0b;
+  font-weight: 800;
+}
 
 .stock {
  background-color: #f1f1f1;

@@ -85,6 +85,7 @@ const form = ref({
   // Derived / backend-managed
   status: "Active",
   nextScheduledDose: null,
+  expiryDate: null,
 });
 
 
@@ -176,6 +177,7 @@ const saveMedicationToDB = async () => {
       nextScheduledDose: nextDose,
       startDate: form.value.startDate,
       endDate: form.value.endDate || null,
+      expiryDate: form.value.expiryDate || null,
     };
 
     await saveMeds(payload);

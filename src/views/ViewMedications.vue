@@ -90,6 +90,10 @@ onMounted(loadMeds)
 
       </table>
 
+      <p v-else class="empty-text">
+          You have no medications yet.
+      </p>
+
       <div v-if="showConfirm" class="modal-backdrop">
         <div class="modal-card">
           <h2>Are you sure you want to delete "{{ medToDeleteName }}"?</h2>
@@ -103,10 +107,6 @@ onMounted(loadMeds)
         </div>
       </div>
 
-      <p v-else class="empty-text">
-        You have no medications yet.
-      </p>
-
       <button class="add-btn" @click="goToAdd">
         + Add Medication
       </button>
@@ -116,65 +116,68 @@ onMounted(loadMeds)
 
 
 <style scoped>
+
 .view-medications-container {
   max-width: var(--card-width);
   margin: 0 auto;
-  padding: 20px;
+  padding: 1rem;
 }
 
 .table-card {
   background: var(--color-card);
-  padding: 24px 20px;
+  padding: 1.25rem;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
 }
 
 .table-card h2 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
 }
+
 
 .med-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  display: block; /* enables scroll */
+  -webkit-overflow-scrolling: touch;
 }
 
 .med-table th,
 .med-table td {
   border-bottom: 1px solid var(--color-border);
-  padding: 10px 8px;
+  padding: 0.6rem 0.75rem;
   text-align: left;
-  font-size: 14px;
+  font-size: 0.875rem;
+  white-space: nowrap; /* prevents column collapse */
 }
 
 .med-table th {
   font-weight: 600;
-  color: var(--color-text);
   background: var(--color-bg);
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .med-table tr:hover {
   background: rgba(0, 0, 0, 0.03);
 }
 
-.edit-btn {
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-}
 
+.edit-btn,
 .delete-btn {
   background: var(--color-primary);
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 0.4rem 0.75rem;
   border-radius: var(--radius-pill);
   cursor: pointer;
+  font-size: 0.8rem;
 }
+
 .edit-btn:hover {
   background: var(--color-primary-hover);
 }
@@ -185,33 +188,26 @@ onMounted(loadMeds)
 
 .add-btn {
   width: 100%;
-  padding: 12px 0;
+  padding: 0.75rem 0;
   background: var(--color-primary);
   color: white;
   border: none;
   border-radius: var(--radius-pill);
-  font-size: 16px;
+  font-size: 1rem;
   cursor: pointer;
-  margin-top: 10px;
 }
+
 .add-btn:hover {
   background: var(--color-primary-hover);
 }
 
+
 .empty-text {
   text-align: center;
-  margin: 20px 0;
+  margin: 1rem 0;
   color: var(--color-subtle-text);
 }
 
-.modal-card {
-  background: var(--color-card);
-  border-radius: var(--radius-lg);
-  padding: 20px 18px;
-  width: 95%;
-  max-width: 480px;
-  box-shadow: var(--shadow-medium);
-}
 
 .modal-backdrop {
   position: fixed;
@@ -223,25 +219,34 @@ onMounted(loadMeds)
   z-index: 40;
 }
 
+.modal-card {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  width: 95%;
+  max-width: 480px;
+  box-shadow: var(--shadow-medium);
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 0.6rem;
 }
 
 .btn-secondary,
 .btn-primary {
-  padding: 8px 16px;
+  padding: 0.5rem 1rem;
   border-radius: var(--radius-pill);
   border: none;
-  font-size: 14px;
+  font-size: 0.875rem;
   cursor: pointer;
 }
 
 .btn-secondary {
   background: #e5e7eb;
-  color: #111827;
 }
+
 .btn-secondary:hover {
   background: #d1d5db;
 }
@@ -250,7 +255,30 @@ onMounted(loadMeds)
   background: var(--color-primary);
   color: white;
 }
+
 .btn-primary:hover {
   background: var(--color-primary-hover);
 }
+
+@media (max-width: 767px) {
+  .view-medications-container {
+    padding: 0.75rem;
+  }
+
+  .table-card {
+    padding: 1rem;
+  }
+
+  .med-table th,
+  .med-table td {
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .view-medications-container {
+    padding: 1.5rem;
+  }
+}
 </style>
+

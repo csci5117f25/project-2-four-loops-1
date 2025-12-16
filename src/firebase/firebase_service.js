@@ -256,7 +256,7 @@ export async function logDose(slot) {
       dateString: dateStr,
       action: "TAKEN",
       takenAt: Timestamp.now(),
-      dosageTaken: doseQuantity ?? null,
+      dosageTaken: slot.medications.doseQuantity ?? null,
     });
 
     // Medication update (ALWAYS update nextScheduledDose)

@@ -203,7 +203,7 @@ const saveMedicationToDB = async () => {
         ? Number(form.value.refillThreshold)
         : null,
       doseQuantity: form.value.doseQuantity,
-      take: form.value.take,
+      // take: form.value.take,
       times: form.value.times,
       // turn this into the object
       schedule: form.value.schedule,
@@ -316,7 +316,7 @@ function editMedication(dbMed) {
     doseQuantity: dbMed.doseQuantity ?? null,
     currentInventory: dbMed.currentInventory ?? null,
     refillThreshold: dbMed.refillThreshold ?? null,
-    take: dbMed.take ?? null,
+    // take: dbMed.take ?? null,
 
     // schedule (normalized)
     schedule: {
@@ -495,9 +495,9 @@ const timeDisplay = computed(() => {
 
         <h4>Dosage & Schedule</h4>
         <div class="form-group">
-          <label>Dosage :</label>
+          <label>Dosage<span class="required">*</span></label>
           <div class="dose-input-wrapper">
-            <input v-model="form.doseQuantity" type="text" placeholder="e.g.: 1"
+            <input v-model="form.doseQuantity" type="text" required placeholder="e.g.: 1"
               :class="{ 'input-error': errors.doseQuantity }"
               @input="markInvalidIfNonNumeric('doseQuantity', $event)" />
             <span v-if="derivedUnit" class="doseUnit">{{ derivedUnit }}</span>
@@ -506,17 +506,17 @@ const timeDisplay = computed(() => {
             </small>
           </div>
         </div>
-        <div class="form-group">
-          <label>What dose will you take? <span class="required">*</span></label>
-          <div class="dose-input-wrapper">
-            <input v-model="form.take" type="text" :class="{ 'input-error': errors.take }"
-              @input="markInvalidIfNonNumeric('take', $event)" />
-            <span v-if="derivedUnit" class="doseUnit">{{ derivedUnit }}</span>
-            <small v-if="errors.take" class="error-text">
-              Please enter Numbers >= 0 only
-            </small>
-          </div>
-        </div>
+        <!-- <div class="form-group"> -->
+        <!-- <label>What dose will you take?</label> -->
+        <!-- <div class="dose-input-wrapper"> -->
+        <!-- <input v-model="form.take" type="text" :class="{ 'input-error': errors.take }" -->
+        <!-- @input="markInvalidIfNonNumeric('take', $event)" /> -->
+        <!-- <span v-if="derivedUnit" class="doseUnit">{{ derivedUnit }}</span> -->
+        <!-- <small v-if="errors.take" class="error-text"> -->
+        <!-- Please enter Numbers >= 0 only -->
+        <!-- </small> -->
+        <!-- </div> -->
+        <!-- </div> -->
 
         <div class="form-group">
           <label>Schedule</label>
@@ -651,7 +651,7 @@ const timeDisplay = computed(() => {
           <li><strong>Name:</strong> {{ form.medicineName }}</li>
           <li><strong>Description:</strong> {{ form.description || "—" }}</li>
           <li><strong>Dosage:</strong> {{ form.doseQuantity || "—" }}</li>
-          <li><strong>What dose will you take: </strong> {{ form.take || "—" }}</li>
+          <!-- <li><strong>What dose will you take: </strong> {{ form.take || "—" }}</li> -->
           <li><strong>Type:</strong> {{ form.form }}</li>
           <li><strong>Schedule:</strong> {{ scheduleDisplay }}</li>
           <li><strong>Time:</strong> {{ timeDisplay }}</li>

@@ -136,34 +136,64 @@ exports.stockReminder = onSchedule(
       .where("status", "==", "Active")
       .get();
 
+    const messages = [];
+
     for (const medDoc of snapshot.docs) {
       const med = medDoc.data();
       const stock = parseFloat(med.currentInventory || 0);
       const threshold = parseFloat(med.refillThreshold || 5);
 
+      // 1. If inventory is zero, do nothing (as requested)
+      if (stock <= 0) continue;
+
+      // 2. Check Threshold
       if (stock <= threshold) {
-        const parentUserRef = medDoc.ref.parent.parent;
+        const userRef = medDoc.ref.parent.parent;
+        
+        // Fetch User & Preferences (including saved pharmacy data)
         const [userSnap, prefSnap] = await Promise.all([
-           parentUserRef.get(),
-           parentUserRef.collection("preferences").doc("general").get()
+           userRef.get(),
+           db.doc(`${userRef.path}/preferences/general`).get()
         ]);
+
+        const userData = userSnap.data();
+        const fcmToken = userData?.fcmToken;
+
+        // 3. No Token -> Do nothing
+        if (!fcmToken) continue;
 
         const prefs = prefSnap.exists ? prefSnap.data() : {};
         if (prefs.enableStockAlerts === false) continue;
 
-        const token = userSnap.data()?.fcmToken;
-        if (!token) continue;
+        // 4. Construct Message Body with Pharmacy Logic
+        let bodyText = `You only have ${stock} ${med.unit || 'units'} of ${med.medicineName} left.`;
+        
+        // 4.1 Check Saved Pharmacy
+        if (prefs.savedPharmacy && prefs.savedPharmacy.name) {
+            bodyText += ` Refill at: ${prefs.savedPharmacy.name}.`;
+        } 
+        // 4.2 Check Nearby (Auto-detected) Pharmacy IF location enabled
+        else if (prefs.enablePharmacyLocation && prefs.nearestPharmacy && prefs.nearestPharmacy.name) {
+            bodyText += ` Nearest pharmacy: ${prefs.nearestPharmacy.name} (~${prefs.nearestPharmacy.distanceMiles} mi).`;
+        }
+        // 4.3 Else (Generic alert - already set in bodyText)
 
-        await getMessaging().send({
-          token,
-          notification: {
-            title: `Low Stock Warning ⚠️`,
-            body: `You only have ${stock} ${med.unit || 'units'} of ${med.medicineName} left.`,
-          },
-        });
+        messages.push(
+            getMessaging().send({
+              token: fcmToken,
+              notification: {
+                title: `Low Stock Warning ⚠️`,
+                body: bodyText,
+              },
+            })
+        );
       }
     }
-    logger.log("✔ Stock scheduler completed.");
+
+    if (messages.length > 0) {
+      await Promise.allSettled(messages);
+      logger.log(`✔ Sent ${messages.length} stock alerts.`);
+    }
   }
 );
 

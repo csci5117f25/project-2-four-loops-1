@@ -5,8 +5,8 @@ import HomeView from "../views/HomeView.vue";
 import AddMedicine from "@/views/AddMedicine.vue";
 import StocksView from "@/views/StocksView.vue";
 
+// Only import the state variable to reset it on logout/404
 import { needsNotificationPrompt } from "@/composables/useNotifications";
-import { useNotifications } from "@/composables/useNotifications";
 
 const auth = getAuth();
 
@@ -24,15 +24,10 @@ const waitForAuth = () =>
     });
   });
 
-/* -------------------------------
-   Only ask notifications once
--------------------------------- */
-let checkedNotificationsThisSession = false;
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // Splash (only meaningful for guests; logged-in users get redirected to dashboard)
+    // Splash (only meaningful for guests)
     {
       path: "/",
       name: "Splash",
@@ -56,7 +51,6 @@ const router = createRouter({
     {
       path: "/edit-medicine/:id",
       name: "EditMedicine",
-      // component: () => import("@/views/EditMedicine.vue"),
       component: AddMedicine,
       props: true,
       meta: { requiresAuth: true },
@@ -95,15 +89,14 @@ router.beforeEach(async (to) => {
   const isLoggedIn = !!auth.currentUser;
 
   // ✅ Logged-in users should not be on splash
-  // (ONLY redirect from "/"; do NOT redirect unknown routes)
   if (to.path === "/" && isLoggedIn) {
     return "/dashboard";
   }
 
-  // ✅ Logged-out users typing protected routes should see 404 (URL stays as typed)
+  // ✅ Logged-out users typing protected routes should see 404
   if (to.meta.requiresAuth && !isLoggedIn) {
+    // Reset notification prompt if they are kicked out
     needsNotificationPrompt.value = false;
-    checkedNotificationsThisSession = false;
 
     return {
       name: "NotFound",
@@ -113,16 +106,10 @@ router.beforeEach(async (to) => {
     };
   }
 
-  // ✅ Notifications prompt logic (once per session, only when logged in)
-  if (isLoggedIn && !checkedNotificationsThisSession) {
-    checkedNotificationsThisSession = true;
-    try {
-      const { shouldAskPermission } = useNotifications();
-      needsNotificationPrompt.value = !!shouldAskPermission();
-    } catch (e) {
-      console.warn("Notification prompt check failed:", e);
-    }
-  }
+  // -----------------------------------------------------------------------
+  // REMOVED: The old "shouldAskPermission" logic.
+  // REASON: App.vue now calls checkTokenStatus() automatically on load.
+  // -----------------------------------------------------------------------
 
   return true;
 });

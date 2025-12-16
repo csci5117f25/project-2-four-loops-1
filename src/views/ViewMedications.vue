@@ -68,12 +68,12 @@ onMounted(loadMeds)
         <tbody>
           <tr v-for="med in medications" :key="med.id">
             <td>{{ med.medicineName }}</td>
-            <td>{{ med.dosageText || '—' }}</td>
+            <td>{{ med.doseQuantity || '—' }}</td>
             <td>{{ med.form }}</td>
             <td>{{ med.scheduleType }}</td>
             <td>{{ med.startDate || '—' }}</td>
             <td>{{ med.endDate || '—' }}</td>
-            <td>{{ med.stockQuantity ?? '—' }}</td>
+            <td>{{ med.currentInventory ?? '—' }}</td>
             <td>
               <button class="edit-btn" @click="goToEdit(med.id)">
                 Edit

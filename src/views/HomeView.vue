@@ -142,7 +142,7 @@ function scrollToFeatures() {
   background: var(--color-primary);
   padding: 14px 28px;
   border: 1px solid transparent;
-  color: var(--color-on-primary);
+  color: var(--color-on-primary,white);
   border-radius: 999px;
   font-size: 16px;
   font-weight: 750;

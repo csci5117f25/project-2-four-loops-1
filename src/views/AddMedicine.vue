@@ -9,6 +9,7 @@ import { mapForm, mapOCRScheduleToOption } from "@/ocr/RxParser";
 import { calculateNextScheduledDose } from "@/utils/scheduleUtils";
 import { useRoute } from "vue-router";
 import { updateMeds, getMedsById } from '@/firebase/firebase_service.js'
+import { Upload } from "lucide-vue-next";
 
 
 const route = useRoute();
@@ -423,23 +424,17 @@ const timeDisplay = computed(() => {
       </div> -->
 
         <div class="ocr-actions">
-          <!-- Upload button -->
-          <button class="icon-btn" title="Upload prescription" @click="openFilePicker">
-            ⬆️
+          <!-- One button -->
+          <button class="icon-btn" title="Upload or scan prescription" @click="openFilePicker">
+            <Upload color="var(--color-subtle-text)" :size="32" />
+            <span class="upload-label">Upload prescription</span>
           </button>
 
-          <!-- Camera button -->
-          <button class="icon-btn" title="Scan using camera" @click="openCamera">
-            📷
-          </button>
 
-          <!-- Hidden upload input -->
+          <!-- One input -->
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleImageSelected" />
-
-          <!-- Hidden camera input -->
-          <input ref="cameraInput" type="file" accept="image/*" capture="environment" hidden
-            @change="handleImageSelected" />
         </div>
+
 
 
         <p v-if="ocrLoading">Scanning prescription…</p>
@@ -1007,7 +1002,7 @@ const timeDisplay = computed(() => {
 }
 
 .ocr-card {
-  background: var(--color-card);
+  background: var(--color-bg);
   border-radius: 14px;
   padding: 1.25rem;
   cursor: pointer;
@@ -1032,7 +1027,7 @@ const timeDisplay = computed(() => {
   margin: 1.5rem 0;
 }
 
-.icon-btn {
+/* .icon-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -1044,17 +1039,56 @@ const timeDisplay = computed(() => {
   display: grid;
   place-items: center;
   transition: background 0.2s ease, transform 0.1s ease;
+}*/
+
+.icon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  color: var(--color-text);
 }
 
+
+.upload-icon {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.upload-label {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+
 .icon-btn:hover {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  transform: translateY(-1px);
+  transform: scale(1.05);
+  border-color: var(--color-primary);
+  border-radius: 15px;
+  padding: 0.5rem;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 0 8px rgba(96, 165, 250, 0.25);
 }
 
 .icon-btn:active {
   transform: translateY(0);
 }
+
 
 .weekday-grid {
   display: grid;

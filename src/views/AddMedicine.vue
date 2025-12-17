@@ -21,7 +21,19 @@ const { ocrResults, loading: ocrLoading, error: ocrError, scanImage } = usePresc
 const fileInput = ref(null);
 const cameraInput = ref(null);
 
-const newTime = ref("");
+// Custom time picker state
+const selectedHour = ref("");
+const selectedMinute = ref("");
+const selectedPeriod = ref("AM");
+
+// Generate minute options in 5-minute intervals: 0, 5, 10, 15, ..., 55
+const minuteOptions = computed(() => {
+  const options = [];
+  for (let i = 0; i < 60; i += 5) {
+    options.push(i);
+  }
+  return options;
+});
 
 const errors = ref({
   doseQuantity: false,
@@ -56,25 +68,6 @@ function handleImageSelected(event) {
 
 
 // ---------- FORM STATE ----------
-// const form = ref({
-//   medicineName: "",
-//   description: "",
-//   unit: "",
-//   status: "",
-//   currentInventory: "",
-//   refillThreshold: "",
-//   doseQuantity: "",
-//   take: "",
-//   times: "",
-//   shedule: {
-//     type: "",
-//     data: ""
-//   },
-//   nextScheduledDose: "",
-//   startDate: "",
-//   endDate: "",
-// });
-
 const form = ref({
   medicineName: "",
   description: "",
@@ -124,12 +117,6 @@ const derivedUnit = computed(() => {
       return "";
   }
 })
-
-// function onImageUpload(e) {
-//   const file = e.target.files[0];
-//   if (file)
-//     scanImage(file);
-// }
 
 function selectOCRMedication(med) {
   // Fill form fields
@@ -276,19 +263,39 @@ function removeCustomDate(date) {
 }
 
 function addTime() {
-  if (!newTime.value) return;
+  if (selectedHour.value === "" || selectedMinute.value === "") return;
 
-  const time = newTime.value;
+  // Convert to 24-hour format for storage
+  let hour24 = parseInt(selectedHour.value);
+  if (selectedPeriod.value === "PM" && hour24 !== 12) {
+    hour24 += 12;
+  } else if (selectedPeriod.value === "AM" && hour24 === 12) {
+    hour24 = 0;
+  }
 
-  if (!form.value.times.includes(time)) {
-    form.value.times.push(time);
+  const timeStr = `${hour24.toString().padStart(2, '0')}:${selectedMinute.value.toString().padStart(2, '0')}`;
+
+  if (!form.value.times.includes(timeStr)) {
+    form.value.times.push(timeStr);
     form.value.times.sort();
   }
-  newTime.value = "";
+
+  // Reset selections
+  selectedHour.value = "";
+  selectedMinute.value = "";
 }
+
 function removeTime(time) {
   form.value.times = form.value.times.filter(t => t !== time);
 }
+
+function formatTimeDisplay(time) {
+  const [h, m] = time.split(":").map(Number);
+  const hour = h % 12 || 12;
+  const suffix = h >= 12 ? "PM" : "AM";
+  return `${hour}:${m.toString().padStart(2, "0")} ${suffix}`;
+}
+
 function markInvalidIfNonNumeric(field, event) {
   const value = event.target.value;
 
@@ -389,12 +396,7 @@ const timeDisplay = computed(() => {
   }
 
   return form.value.times
-    .map(t => {
-      const [h, m] = t.split(":").map(Number);
-      const hour = h % 12 || 12;
-      const suffix = h >= 12 ? "PM" : "AM";
-      return `${hour}:${m.toString().padStart(2, "0")} ${suffix}`;
-    })
+    .map(t => formatTimeDisplay(t))
     .join(", ");
 });
 
@@ -506,17 +508,6 @@ const timeDisplay = computed(() => {
             </small>
           </div>
         </div>
-        <!-- <div class="form-group"> -->
-        <!-- <label>What dose will you take?</label> -->
-        <!-- <div class="dose-input-wrapper"> -->
-        <!-- <input v-model="form.take" type="text" :class="{ 'input-error': errors.take }" -->
-        <!-- @input="markInvalidIfNonNumeric('take', $event)" /> -->
-        <!-- <span v-if="derivedUnit" class="doseUnit">{{ derivedUnit }}</span> -->
-        <!-- <small v-if="errors.take" class="error-text"> -->
-        <!-- Please enter Numbers >= 0 only -->
-        <!-- </small> -->
-        <!-- </div> -->
-        <!-- </div> -->
 
         <div class="form-group">
           <label>Schedule</label>
@@ -568,7 +559,19 @@ const timeDisplay = computed(() => {
           <label>What time(s) do you take the medication?</label>
 
           <div class="time-input-row">
-            <input type="time" v-model="newTime" />
+            <select v-model="selectedHour" class="time-select">
+              <option disabled value="">HH</option>
+              <option v-for="h in 12" :key="h" :value="h">{{ h }}</option>
+            </select>
+            <span class="time-separator">:</span>
+            <select v-model="selectedMinute" class="time-select">
+              <option disabled value="">MM</option>
+              <option v-for="m in minuteOptions" :key="m" :value="m">{{ m.toString().padStart(2, '0') }}</option>
+            </select>
+            <select v-model="selectedPeriod" class="time-select period-select">
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
             <button type="button" class="add-time-btn" @click="addTime">
               + Add
             </button>
@@ -576,7 +579,7 @@ const timeDisplay = computed(() => {
 
           <ul v-if="form.times.length" class="time-list">
             <li v-for="time in form.times" :key="time">
-              {{ time }}
+              {{ formatTimeDisplay(time) }}
               <button type="button" @click="removeTime(time)">✕</button>
             </li>
           </ul>
@@ -855,13 +858,40 @@ const timeDisplay = computed(() => {
   color: var(--color-subtle-text);
 }
 
-/* Time input */
-input[type="time"] {
+/* Time input - Custom dropdowns */
+.time-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.time-select {
+  padding: 9px 8px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  min-width: 60px;
   cursor: pointer;
 }
 
-input[type="time"]::-webkit-calendar-picker-indicator {
-  display: block;
+.time-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+}
+
+.period-select {
+  min-width: 65px;
+}
+
+.time-separator {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  padding: 0 2px;
 }
 
 /* Button */
@@ -1071,14 +1101,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   font-size: 14px;
 }
 
-.time-input-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
 .add-time-btn {
-  padding: 6px 12px;
+  padding: 8px 14px;
   border-radius: var(--radius-pill);
   border: none;
   background: var(--color-primary);
@@ -1086,6 +1110,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   border-color: var(--color-primary);
   cursor: pointer;
   font-size: 13px;
+  white-space: nowrap;
 }
 
 .add-time-btn:hover {

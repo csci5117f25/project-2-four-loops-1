@@ -16,7 +16,7 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log("[SW] Background Message:", payload);
   
-  const notificationTitle = payload.notification?.title || "Medication Reminder";
+  const notificationTitle = payload.notification?.title || "MediMate Reminder";
   const notificationOptions = {
     body: payload.notification?.body,
     icon: "/icons/icon-192.png",

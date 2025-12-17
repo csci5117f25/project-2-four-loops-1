@@ -166,8 +166,8 @@ export function useNotifications() {
 
     // 1. Show In-App Toast (Now renders the HTML link via App.vue update)
     showToast({
-      severity: "info",
-      summary: title || "New Message",
+      severity: "success",
+      summary: title || "MediMate Reminder",
       detail: detailHtml, 
       life: 8000, 
     });

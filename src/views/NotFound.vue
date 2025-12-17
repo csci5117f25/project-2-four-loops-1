@@ -80,7 +80,7 @@ function goBack() {
   padding: 0 12px;
   border-radius: 999px;
   background: var(--color-primary-hover, rgba(37, 99, 235, 0.12));
-  color: var(--color-primary, #2563eb);
+  color:  #f9fbff;
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.3px;

@@ -6,7 +6,7 @@ CSCI 5117, Fall 2025, [assignment description](https://canvas.umn.edu/courses/51
 
 * Team Name: FOUR LOOPS
 * App Name: MediMate
-* App Link: <https://TODO.com/>
+* App Link: [(https://project2-e9097.web.app)]
 
 ### Students
 
@@ -20,15 +20,21 @@ CSCI 5117, Fall 2025, [assignment description](https://canvas.umn.edu/courses/51
 **Describe the most challenging features you implemented
 (one sentence per bullet, maximum 4 bullets):**
 
-* ...
+* Notification - Implemented both in-app toast notifications and system-level browser notifications, ensuring users enable the required browser permissions to securely store and use FCM tokens.
+* Geo location - Determines and stores the nearest pharmacy based on the user’s real-time location when a saved pharmacy is not available.
+* Prescription OCR - since real prescriptions vary widely in format and quality, requiring robust handling of imperfect text recognition to convert unstructured images into structured medication records
+
 
 Which (if any) device integration(s) does your app support?
 
-* ...
+* Camera
+* Location
+* System Notification
+* Filepicker
 
 Which (if any) progressive web app feature(s) does your app support?
 
-* ...
+N/A
 
 
 
@@ -44,7 +50,13 @@ Note: Please zoom in and out each page to view the full flow and there are 2 pag
 
 **Is there anything special we need to know in order to effectively test your app? (optional):**
 
-* ...
+* The medication scheduler usually runs every 5 minutes to check for due medications. To save the credits we have changed it to every hour.
+* If a medication time is not specified, the user is notified at 9:00 AM on the medication’s due date.
+* Ensure medication and stock notifications are enabled in the Preferences section, and browser notification permissions are granted.
+* A pharmacy must be saved in the Settings page to appear in notifications.
+* If location access is enabled but no pharmacy is saved, the app automatically selects and stores the nearest pharmacy at the beginning.
+* It's a hit or a miss on the iphone and we would suggest testing it on Android.
+
 
 
 
@@ -62,11 +74,32 @@ along with a very brief caption:**
 **Document integrations with 3rd Party code or services here.
 Please do not document required libraries (e.g., VUE, Firebase, vuefire).**
 
-* Library or service name: description of use
-* ...
+* 1.⁠ ⁠Tesseract.js 
+•⁠  ⁠Used for OCR to extract text from prescription images uploaded by the user or captured via the device camera. 
+•⁠  ⁠OCR results are processed client-side to avoid sending sensitive medical images to external servers. 
+•⁠  ⁠The extracted text is passed through a custom RegEx-based parsing pipeline to identify medication names, dosages, and scheduling cues.
+
+* 2.⁠ ⁠Browser Media APIs (getUserMedia)
+•⁠  ⁠Used to access the device camera for live prescription capture. 
+•⁠  ⁠This enables users—especially on mobile devices—to scan prescriptions using the device camera. Camera access is requested explicitly by user interaction and handled entirely in the browser.
+
+* 3.⁠ ⁠Lucide (lucide-vue-next)
+•⁠  ⁠Used icons from the Lucide icon pack for Vue
+
+* 4.⁠ Leaflet
+•⁠  Implemented geolocation and pharmacy mapping using Leaflet for interactive maps and ArcGIS services for accurate location lookup and proximity-based pharmacy detection.
+
+* 5. Primevue
+•⁠ Used for UI components to ensure consistent styling and responsive interaction.
+
 
 **If there's anything else you would like to disclose about how your project
 relied on external code, expertise, or anything else, please disclose that
 here:**
 
-...
+* ⁠At times, OCR might fail on camera capture. OCR accuracy depends heavily on image quality, lighting, and handwriting/print clarity. The application includes user feedback stating when OCR results cannot be confidently extracted.
+* ⁠No external AI or cloud OCR services were used. All OCR processing occurs locally in the browser for privacy and security reasons.
+* Scheduling logic and dose-tracking behavior were custom-implemented to support flexible medication 
+  •⁠  ⁠Day-wise schedules  Everyday, Specific Days, Every Few Days, Custom
+  •⁠  ⁠Tracking doses to be taken multiple times during the day
+

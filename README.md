@@ -6,7 +6,7 @@ CSCI 5117, Fall 2025, [assignment description](https://canvas.umn.edu/courses/51
 
 * Team Name: FOUR LOOPS
 * App Name: MediMate
-* App Link: [(https://project2-e9097.web.app)]
+* App Link: https://project2-e9097.web.app
 
 ### Students
 
@@ -115,6 +115,10 @@ Settings - Notifications and Pharmacy:
 
 <img width="1872" height="455" alt="image" src="https://github.com/user-attachments/assets/a817135b-c49b-401e-a803-0f70863c4af8" />
 
+System Notification:
+
+
+<img width="808" height="347" alt="image" src="https://github.com/user-attachments/assets/000e89a7-485b-4e31-9ad9-8bc0795efc34" />
 
 
 ## External Dependencies

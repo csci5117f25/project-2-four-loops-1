@@ -9,7 +9,7 @@ const db = getFirestore();
 
 exports.medicationReminder = onSchedule(
   {
-    schedule: "*/5 * * * *",
+    schedule: "0 * * * *",
     timeZone: "America/Chicago",
   },
   async () => {

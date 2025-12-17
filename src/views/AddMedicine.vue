@@ -9,7 +9,7 @@ import { mapForm, mapOCRScheduleToOption } from "@/ocr/RxParser";
 import { calculateNextScheduledDose } from "@/utils/scheduleUtils";
 import { useRoute } from "vue-router";
 import { updateMeds, getMedsById } from '@/firebase/firebase_service.js'
-import { Upload } from "lucide-vue-next";
+import { Upload, Focus } from "lucide-vue-next";
 
 
 const route = useRoute();
@@ -401,6 +401,60 @@ const timeDisplay = computed(() => {
     .join(", ");
 });
 
+// CAMERA FUNCTIONS
+const showCamera = ref(false);
+const videoEl = ref(null);
+const cameraStatus = ref("");
+let videoStream = null;
+
+async function startCamera() {
+  try {
+    cameraStatus.value = "Requesting camera access…";
+    showCamera.value = true;
+
+    videoStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment" },
+      audio: false,
+    });
+
+    videoEl.value.srcObject = videoStream;
+    cameraStatus.value = "Camera ready. Hold steady and capture.";
+  } catch (err) {
+    console.error(err);
+    cameraStatus.value = "Camera access denied. Please allow permissions.";
+    showCamera.value = false;
+  }
+}
+
+function stopCamera() {
+  if (videoStream) {
+    videoStream.getTracks().forEach(t => t.stop());
+    videoStream = null;
+  }
+  showCamera.value = false;
+}
+
+async function captureFromCamera() {
+  if (!videoEl.value?.videoWidth) {
+    cameraStatus.value = "Camera not ready yet.";
+    return;
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = videoEl.value.videoWidth;
+  canvas.height = videoEl.value.videoHeight;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(videoEl.value, 0, 0);
+
+  const dataURL = canvas.toDataURL("image/png");
+
+  stopCamera();
+
+  // reuse your existing OCR pipeline
+  await scanImage(dataURL);
+}
+
 </script>
 
 
@@ -424,17 +478,33 @@ const timeDisplay = computed(() => {
       </div> -->
 
         <div class="ocr-actions">
-          <!-- One button -->
-          <button class="icon-btn" title="Upload or scan prescription" @click="openFilePicker">
+          <!-- Upload -->
+          <button class="icon-btn" @click="openFilePicker">
             <Upload color="var(--color-subtle-text)" :size="32" />
-            <span class="upload-label">Upload prescription</span>
+            <span class="icon-label">Upload prescription</span>
           </button>
 
+          <!-- Camera -->
+          <button class="icon-btn" @click="startCamera">
+            <Focus color="var(--color-subtle-text)" :size="32" />
+            <span class="icon-label">Use camera</span>
+          </button>
 
-          <!-- One input -->
-          <!-- <input ref="fileInput" type="file" accept="image/*" hidden @change="handleImageSelected" /> -->
-          <input ref="fileInput" type="file" accept="image/*" capture="environment" hidden
-            @change="handleImageSelected" />
+          <input ref="fileInput" type="file" accept="image/*" hidden @change="handleImageSelected" />
+        </div>
+
+        <!-- Camera modal -->
+        <div v-if="showCamera" class="camera-modal">
+          <video ref="videoEl" autoplay playsinline></video>
+
+          <div class="camera-actions">
+            <button class="btn-secondary" @click="stopCamera">Cancel</button>
+            <button class="btn-primary" @click="captureFromCamera">
+              Capture & Extract
+            </button>
+          </div>
+
+          <p class="status-text">{{ cameraStatus }}</p>
         </div>
 
 

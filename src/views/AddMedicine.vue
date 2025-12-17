@@ -550,10 +550,7 @@ const timeDisplay = computed(() => {
 
         </div>
 
-        <!-- Course length text -->
-        <p v-if="courseLength" class="course-info">
-          Your course of meds runs for <strong>{{ courseLength }}</strong> days.
-        </p>
+
 
         <div class="form-group">
           <label>What time(s) do you take the medication?</label>
@@ -596,6 +593,10 @@ const timeDisplay = computed(() => {
             <input v-model="form.endDate" type="date" @click="openDatePicker" />
           </div>
         </div>
+        <!-- Course length text -->
+        <p v-if="courseLength" class="course-info">
+          Your course of meds runs for <strong>{{ courseLength }}</strong> days.
+        </p>
 
         <h4>Additional Details</h4>
         <div class="form-group">
@@ -1147,5 +1148,19 @@ const timeDisplay = computed(() => {
   color: #dc2626;
   font-size: 12px;
   margin-top: 2px;
+}
+
+input[type="date"],
+input[type="time"] {
+  color: var(--color-text);
+  /* your text color */
+}
+
+/* Date & time picker icons */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  /* black */
+  opacity: 1;
 }
 </style>

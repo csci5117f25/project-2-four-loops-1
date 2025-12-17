@@ -67,39 +67,54 @@ Splash Page:
 
 <img width="1897" height="910" alt="image" src="https://github.com/user-attachments/assets/faae1e5c-e48a-4794-b235-eb94fb336863" />
 
+
 Dashboard:
 
+
 <img width="1906" height="916" alt="image" src="https://github.com/user-attachments/assets/1ad7d0bd-2903-4c8b-aed5-45b393e8fb50" />
+
  
 Logging a Medicine:
+
  
 <img width="1914" height="939" alt="image" src="https://github.com/user-attachments/assets/045785fb-deed-4b1e-8a37-4452508eb23c" />
 
-Add Medication - with OCR
+
+Add Medication - with OCR:
+
  
 <img width="1898" height="953" alt="image" src="https://github.com/user-attachments/assets/f8012a86-378b-4f6c-b16d-71b55acc69bd" />
 
 <img width="1919" height="908" alt="image" src="https://github.com/user-attachments/assets/78d9b5c8-24e6-4314-90a8-1279042a65d2" />
 
+
 My Medications:
 
+
 <img width="1919" height="871" alt="image" src="https://github.com/user-attachments/assets/98d0bb96-b8e0-42f6-b919-2c7922584873" />
+
  
 Edit Medication:
 
+
 <img width="700" height="850" alt="image" src="https://github.com/user-attachments/assets/8a7472eb-cf46-4d47-a78a-6816bb4c40b4" />
+
  
 View Inventory:
+
  
 <img width="1919" height="835" alt="image" src="https://github.com/user-attachments/assets/b4bc1a7f-8a16-4b88-8204-34b4f5000fe5" />
+
  
 Settings - Notifications and Pharmacy:
+
 
 <img width="965" height="846" alt="image" src="https://github.com/user-attachments/assets/42b2fff8-a0dd-4ddb-8275-debbe61daee0" />
 
 <img width="1919" height="818" alt="image" src="https://github.com/user-attachments/assets/beae1228-bda1-49d5-b2c5-429a907588f1" />
 
 <img width="1872" height="455" alt="image" src="https://github.com/user-attachments/assets/a817135b-c49b-401e-a803-0f70863c4af8" />
+
 
 
 ## External Dependencies
